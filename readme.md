@@ -285,7 +285,7 @@
         ]
         ```
 
-  - Not: [_id](http://_vscodecontentref_/3) alanı, ayı temsil eder (1: Ocak, 2: Şubat, vb.).
+  - Not: [_id] alanı, ayı temsil eder (1: Ocak, 2: Şubat, vb.).
 
 - **GET api/chart/total/sales**
   - Açıklama: Tüm çalışanların toplam maaşını getirir.
@@ -304,6 +304,87 @@
 ```bash
 curl -X GET http://localhost:3000/api/chart/total 
 ```
+
+## Task Servisi
+
+### Task Routes
+
+- **POST api/tasks/add**
+  - Açıklama: Yeni bir görev ekler.
+  - Body:
+
+        ```json
+        {
+          "title": "Görev Başlığı",
+          "description": "Görev Açıklaması",
+          "status": "pendig",
+          "dueDate": "2025-03-15"
+        }
+        ```
+
+  - Not: [status](http://_vscodecontentref_/1) alanı sadece "pendig", "in progress" ve "completed" değerlerini kabul eder.
+
+- **GET api/tasks/all**
+  - Açıklama: Tüm görevleri listeler.
+  - Response:
+
+        ```json
+        [
+          {
+            "_id": "60d21b4667d0d8992e610c85",
+            "title": "Görev Başlığı",
+            "description": "Görev Açıklaması",
+            "status": "pendig",
+            "dueDate": "2025-03-15T00:00:00.000Z"
+          },
+          ...
+        ]
+        ```
+
+- **GET api/tasks/find/:id**
+  - Açıklama: Belirtilen ID'ye sahip görevi getirir.
+  - Params:
+    - [id](http://_vscodecontentref_/2): Görev ID'si
+  - Response:
+
+        ```json
+        {
+          "_id": "60d21b4667d0d8992e610c85",
+          "title": "Görev Başlığı",
+          "description": "Görev Açıklaması",
+          "status": "pendig",
+          "dueDate": "2025-03-15T00:00:00.000Z"
+        }
+        ```
+
+- **PUT api/tasks/update/:id**
+  - Açıklama: Belirtilen ID'ye sahip görevin durumunu günceller.
+  - Params:
+    - [id]: Görev ID'si
+  - Body:
+
+        ```json
+        {
+          "status": "in progress"
+        }
+        ```
+
+  - Not: [status] alanı sadece "bekliyor", "işe alındı" ve "tamamlandı" değerlerini kabul eder.
+
+- **DELETE api/tasks/delete/:id**
+  - Açıklama: Belirtilen ID'ye sahip görevi siler.
+  - Params:
+    - [id](http://_vscodecontentref_/5): Görev ID'si
+  - Response:
+
+        ```json
+        {
+          "message": "Task deleted!"
+        }
+        ```
+
+
+
 ## Middleware
 
 - **currentUser**

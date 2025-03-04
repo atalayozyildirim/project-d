@@ -7,6 +7,7 @@ const router = express.Router();
 router.get(
   "/add",
   [
+    body("userId").isString().notEmpty().withMessage("User Id not valid !"),
     body("host").isString().notEmpty().withMessage("Host not valid !"),
     body("port").isInt().notEmpty().withMessage("Port not valid !"),
     body("user").isString().notEmpty().withMessage("User not valid !"),
@@ -19,9 +20,10 @@ router.get(
       return res.status(400).json({ errors: err.array() });
     }
 
-    const { user, password, host, port, from } = req.body;
+    const { userId, user, password, host, port, from } = req.body;
 
     const mail = new MailData({
+      userId,
       user,
       password,
       host,
