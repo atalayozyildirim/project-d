@@ -4,6 +4,7 @@ import userRouter from "./user/user.js";
 import employerRouter from "./employers/employers.js";
 import customerRouter from "./customer/customer.js";
 import invoiceRouter from "./invoice/invoice.js";
+import mailRouter from "./mail/mail.js";
 import { currentUser } from "../middleware/currentUser.js";
 
 const router = express.Router();
@@ -13,5 +14,6 @@ router.use("/user", currentUser, userRouter);
 router.use("/emp", currentUser, employerRouter);
 router.use("/invoice", currentUser, invoiceRouter);
 router.use("/customer", currentUser, customerRouter);
+router.use("/mail", currentUser, mailRouter);
 
 export default router;

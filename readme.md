@@ -156,6 +156,91 @@
     - Params:
         - `id`: Fatura ID'si
 
+## Mail Servisi
+
+### Mail Routes
+ - (/:id)  Belirtilen kullanıcının Id degerine gore mail servisi için config verilerini ceker
+- **GET api/mail/inbox/:id**
+  - Açıklama: Inbox'taki tüm mailleri listeler.
+  - Response:
+
+        ```json
+        [
+          {
+            "subject": "Mail Subject",
+            "from": "sender@example.com",
+            "date": "2025-03-04T12:34:56.789Z",
+            "text": "Mail content"
+          },
+          ...
+        ]
+        ```
+
+- **POST api/mail/add**
+  - Açıklama: Yeni mail sunucusu bilgisi ekler.
+  - Body:
+
+        ```json
+        {
+          "userId": "user_id",
+          "user": "user@example.com",
+          "password": "password123",
+          "host": "smtp.example.com",
+          "port": 587,
+          "from": "from@example.com"
+        }
+        ```
+
+- **GET api/mail/getEmail/:id**
+  - Açıklama: Belirtilen ID'ye sahip mail sunucusu bilgilerini getirir.
+  - Params:
+    - `id`: Mail sunucusu bilgisi ID'si
+  - Response:
+
+        ```json
+        {
+          "userId": "user_id",
+          "user": "user@example.com",
+          "password": "password123",
+          "host": "smtp.example.com",
+          "port": 587,
+          "from": "from@example.com"
+        }
+        ```
+
+- **DELETE api/mail/delete/:id**
+  - Açıklama: Belirtilen ID'ye sahip mail sunucusu bilgilerini siler.
+  - Params:
+    - `id`: Mail sunucusu bilgisi ID'si
+
+- **POST api/mail/sendMail**
+  - Açıklama: E-posta gönderir.
+  - Body:
+
+        ```json
+        {
+          "to": "recipient@example.com",
+          "subject": "Mail Subject",
+          "text": "Mail content"
+        }
+        ```
+
+- **PATCH api/mail/update/:id**
+  - Açıklama: Belirtilen ID'ye sahip mail sunucusu bilgilerini günceller.
+  - Params:
+    - `id`: Mail sunucusu bilgisi ID'si
+  - Body:
+
+        ```json
+        {
+          "user": "newuser@example.com",
+          "password": "newpassword",
+          "host": "newhost",
+          "port": 993,
+          "from": "newfrom@example.com"
+        }
+        ```
+
 ## Middleware
 
 - **currentUser**
