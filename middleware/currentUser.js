@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 const currentUser = (req, res, next) => {
+  console.log(req.cookies.acsess_token);
   if (!req.cookies.acsess_token) {
     return res.status(401).send({ message: "Not authorized" });
   }

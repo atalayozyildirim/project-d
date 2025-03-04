@@ -5,6 +5,7 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import session from "express-session";
 import { connectDb } from "./db/ConnectDb.js";
+import cookieParser from "cookie-parser";
 import router from "./router/main.js";
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.use(
     },
   })
 );
+app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
 app.use(morgan("tiny"));
