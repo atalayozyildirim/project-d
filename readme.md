@@ -241,6 +241,69 @@
         }
         ```
 
+## Chart Servisi
+
+### Chart Routes
+
+- **GET api/chart/total**
+  - Açıklama: Toplam fatura, müşteri ve işveren sayısını getirir.
+  - Response:
+
+        ```json
+        {
+          "totalInvoices": 100,
+          "totalCustomers": 50,
+          "totalEmployers": 20
+        }
+        ```
+
+- **GET api/chart/totalInvoices**
+  - Açıklama: Tüm faturaların toplam [total](http://_vscodecontentref_/1) değerini getirir.
+  - Response:
+
+        ```json
+        {
+          "totalAmount": 50000
+        }
+        ```
+
+- **GET api/chart/totalInvoicesByMonth**
+  - Açıklama: Faturaları aylık olarak gruplandırır ve her ayın toplam [total](http://_vscodecontentref_/2) değerini getirir.
+  - Response:
+
+        ```json
+        [
+          {
+            "_id": 1,
+            "totalAmount": 10000
+          },
+          {
+            "_id": 2,
+            "totalAmount": 15000
+          },
+          ...
+        ]
+        ```
+
+  - Not: [_id](http://_vscodecontentref_/3) alanı, ayı temsil eder (1: Ocak, 2: Şubat, vb.).
+
+- **GET api/chart/total/sales**
+  - Açıklama: Tüm çalışanların toplam maaşını getirir.
+  - Response:
+
+        ```json
+        {
+          "totalSalary": 200000
+        }
+        ```
+
+### Örnek Kullanım
+
+#### Toplam Fatura, Müşteri ve İşveren Sayısını Getirme
+
+```bash
+curl -X GET http://localhost:3000/api/chart/total 
+```
 ## Middleware
 
 - **currentUser**
