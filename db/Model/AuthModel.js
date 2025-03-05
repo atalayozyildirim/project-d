@@ -15,6 +15,14 @@ const AuthSchema = new moongose.Schema({
     type: String,
     required: true,
   },
+  resetPasswordToken: {
+    type: String,
+    required: false,
+  },
+  resetPasswordExpires: {
+    type: Date,
+    required: false,
+  },
   token: {
     type: String,
     required: false,

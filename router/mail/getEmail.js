@@ -1,18 +1,16 @@
 import express from "express";
-import MailData from "../../db/Model/MailData.js";
+import ImapEmail from "../../db/Model/ImapEmail.js";
 import imaps from "imap-simple";
 import { simpleParser } from "mailparser";
 
 const router = express.Router();
 
-router.get("inbox/:id", async (req, res) => {
+router.get("/inbox", async (req, res) => {
   try {
-    const { id } = req.params;
-    if (!id) {
-      return res.status(400).json({ message: "ID is required!" });
-    }
+    const mailData = await ImapEmail.findOne({
+      userId: req.currentUser.user.id,
+    });
 
-    const mailData = await MailData.findById({ userId: id });
     if (!mailData) {
       return res.status(404).json({ message: "Mail data not found!" });
     }
@@ -28,9 +26,9 @@ router.get("inbox/:id", async (req, res) => {
       },
     };
 
-    const connect = await imaps.connect(config);
+    const connection = await imaps.connect(config);
 
-    await connect.openBox("INBOX");
+    await connection.openBox("INBOX");
 
     const searchCriteria = ["ALL"];
     const fetchOptions = {
@@ -38,25 +36,29 @@ router.get("inbox/:id", async (req, res) => {
       markSeen: true,
     };
 
-    const messages = await connect.search(searchCriteria, fetchOptions);
+    const messages = await connection.search(searchCriteria, fetchOptions);
 
     const emails = await Promise.all(
-      message.map(async (item) => {
+      messages.map(async (item) => {
         const all = item.parts.find((part) => part.which === "TEXT");
+        if (!all) {
+          return null;
+        }
         const id = item.attributes.uid;
         const idHeader = "Imap-Id: " + id + "\r\n";
         const mail = await simpleParser(idHeader + all.body);
 
         return {
           id,
-          subject: mail.subject,
-          from: mail.from.text,
-          text: mail.text,
-          html: mail.html,
+          subject: mail.subject || "(No Subject)",
+          from: mail.from ? mail.from.text : "(No Sender)",
+          text: mail.text || "",
+          html: mail.html || "",
         };
       })
-    );
-    await connect.end();
+    ).catch((err) => console.log(err));
+
+    await connection.end();
     res.status(200).json(emails);
   } catch (error) {
     return res.status(500).json({ message: "Server error", error });

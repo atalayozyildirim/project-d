@@ -144,12 +144,27 @@
     - Açıklama: Yeni fatura ekler.
     - Body:
         ```json
-        {
-          "customer": "Customer XYZ",
-          "amount": 1000,
-          "dueDate": "2025-03-15"
+       {
+            "invoiceNumber": "INV-002",
+            "invoiceDate": "2025-03-04",
+            "customerName": "John Doe",
+            "customerAddress": "123 Main St, Anytown, USA",
+            "items": [
+                {
+                    "description": "Product 1",
+                    "quantity": 2,
+                    "price": 50
+                },
+                {
+                    "description": "Product 2",
+                    "quantity": 1,
+                    "price": 100
+                }
+            ],
+            "total": 6000,
+            "status": "pending"
         }
-        ```
+      ```
 
 - **DELETE api/invoice/delete/:id**
     - Açıklama: Belirtilen ID'ye sahip faturayı siler.
@@ -159,8 +174,8 @@
 ## Mail Servisi
 
 ### Mail Routes
- - (/:id)  Belirtilen kullanıcının Id degerine gore mail servisi için config verilerini ceker
-- **GET api/mail/inbox/:id**
+ - Kullanıcının sahip oldugu imape gore mail servisi için config verilerini ceker
+- **GET api/mail/inbox
   - Açıklama: Inbox'taki tüm mailleri listeler.
   - Response:
 
@@ -177,12 +192,12 @@
         ```
 
 - **POST api/mail/add**
-  - Açıklama: Yeni mail sunucusu bilgisi ekler.
+  - Açıklama: Yeni smtp mail sunucusu bilgisi ekler mail göndermek icin gerekir.
   - Body:
 
         ```json
         {
-          "userId": "user_id",
+         
           "user": "user@example.com",
           "password": "password123",
           "host": "smtp.example.com",
@@ -190,16 +205,26 @@
           "from": "from@example.com"
         }
         ```
+- **POST api/mail/imap/add**
+  - Açıklama: Yeni imap sunucu bilgilerini ekler , Inbox icin gerekir
+  - Body:
 
-- **GET api/mail/getEmail/:id**
-  - Açıklama: Belirtilen ID'ye sahip mail sunucusu bilgilerini getirir.
-  - Params:
-    - `id`: Mail sunucusu bilgisi ID'si
+        ```json
+        {
+         
+          "host": "smtp.example.com",
+          "port": 587,
+          "user": "user@example.com",
+          "password": "password123",
+        }
+        ```
+
+- **GET api/mail/getEmail/**
+  - Açıklama: Kullanıcının sahip oldugu mail sunucusu bilgilerini getirir.
   - Response:
 
         ```json
         {
-          "userId": "user_id",
           "user": "user@example.com",
           "password": "password123",
           "host": "smtp.example.com",
@@ -213,8 +238,10 @@
   - Params:
     - `id`: Mail sunucusu bilgisi ID'si
 
+- **POST api/mail/testEmail**
+- Açıklama: Ethereal Mail kullanarak test mail yollar
 - **POST api/mail/sendMail**
-  - Açıklama: E-posta gönderir.
+  - Açıklama: Test E-posta gönderir.
   - Body:
 
         ```json
@@ -296,6 +323,40 @@
           "totalSalary": 200000
         }
         ```
+- **GET api/chart/monthSalesRevenue**
+  - Açıklama: Aylık satış bilgileri ort.
+  - Response:
+
+        ```json
+         {
+        "_id": 3,
+        "totalRevenue": 6200
+    }
+        ```
+- **GET api/chart/newCustomersByMonth**
+  - Açıklama: Aylık gelen yeni müsteriler.
+  - Response:
+
+        ```json
+        {
+        "_id": 3,
+        "total": 1
+        }
+        ```
+- **GET api/chart/topSellingProducts**
+  - Açıklama: En cok satılarn products (getirir Faturaya eklenen items gore).
+  - Response:
+
+        ```json
+           {
+              "_id": "Product 1",
+              "total": 4
+          },
+          {
+              "_id": "Product 2",
+              "total": 2
+          }
+        ```
 
 ### Örnek Kullanım
 
@@ -322,7 +383,7 @@ curl -X GET http://localhost:3000/api/chart/total
         }
         ```
 
-  - Not: [status](http://_vscodecontentref_/1) alanı sadece "pendig", "in progress" ve "completed" değerlerini kabul eder.
+  - Not: [status] alanı sadece "pendig", "in progress" ve "completed" değerlerini kabul eder.
 
 - **GET api/tasks/all**
   - Açıklama: Tüm görevleri listeler.

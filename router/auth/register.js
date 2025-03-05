@@ -35,6 +35,7 @@ router.post(
       await user.save();
 
       const userModelinSave = await new UserModel({
+        userId: user._id,
         name,
         email,
       });

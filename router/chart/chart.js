@@ -62,12 +62,75 @@ router.get("/total/sales", async (req, res) => {
         },
       },
     ]);
-    if (totalSalaries.length > 0) {
-      return res
-        .status(200)
-        .json({ totalSalary: totalSalaries[0].totalSalary });
+    if (salesTotal.length > 0) {
+      return res.status(200).json({ totalSalary: salesTotal[0].totalSalary });
     } else {
       return res.status(200).json({ totalSalary: 0 });
+    }
+  } catch {
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+router.get("/monthSalesRevenue", async (req, res) => {
+  try {
+    const monthlyRevenue = await Invoice.aggregate([
+      {
+        $group: {
+          _id: { $month: "$invoiceDate" },
+          totalRevenue: { $sum: "$total" },
+        },
+      },
+    ]);
+    if (monthlyRevenue.length > 0) {
+      return res.status(200).json(monthlyRevenue);
+    } else {
+      return res.status(200).json([]);
+    }
+  } catch {
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+router.get("/newCustomersByMonth", async (req, res) => {
+  try {
+    const newCustomers = await Customer.aggregate([
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          total: { $sum: 1 },
+        },
+      },
+    ]);
+    if (newCustomers.length > 0) {
+      return res.status(200).json(newCustomers);
+    } else {
+      return res.status(200).json([]);
+    }
+  } catch {
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/topSellingProducts", async (req, res) => {
+  try {
+    const topProducts = await Invoice.aggregate([
+      {
+        $unwind: "$items",
+      },
+      {
+        $group: {
+          _id: "$items.description",
+          total: { $sum: "$items.quantity" },
+        },
+      },
+      {
+        $sort: { totalSold: -1 },
+      },
+      { $limit: 10 },
+    ]);
+    if (topProducts.length > 0) {
+      return res.status(200).json(topProducts);
+    } else {
+      return res.status(200).json([]);
     }
   } catch {
     return res.status(500).json({ message: "Server error" });

@@ -21,7 +21,7 @@ router.post(
 
     const { name, surname, email, phone, salary } = req.body;
 
-    const exists = EmployersModel.findOne({ email });
+    const exists = await EmployersModel.findOne({ email });
 
     if (exists) {
       return res.status(400).json({ message: "Email already exists" });
