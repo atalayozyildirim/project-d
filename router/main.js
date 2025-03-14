@@ -7,6 +7,8 @@ import invoiceRouter from "./invoice/invoice.js";
 import mailRouter from "./mail/mail.js";
 import charts from "./chart/chart.js";
 import taskRouter from "./tasks/tasks.js";
+import commentRouter from "./comment/comment.js";
+import aiRouter from "./ai/index.js";
 import { currentUser } from "../middleware/currentUser.js";
 
 const router = express.Router();
@@ -18,6 +20,8 @@ router.use("/invoice", currentUser, invoiceRouter);
 router.use("/customer", currentUser, customerRouter);
 router.use("/charts", currentUser, charts);
 router.use("/task", currentUser, taskRouter);
+router.use("/comment", currentUser, commentRouter);
+router.use("/ai", currentUser, aiRouter);
 router.use("/mail", currentUser, mailRouter);
 
 export default router;

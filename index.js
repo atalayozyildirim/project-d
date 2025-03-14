@@ -7,14 +7,25 @@ import session from "express-session";
 import { connectDb } from "./db/ConnectDb.js";
 import cookieParser from "cookie-parser";
 import router from "./router/main.js";
+import { createClient } from "redis";
+import { RedisStore } from "connect-redis";
+import { redisConnect } from "./db/redis/redisConnect.js";
 
 dotenv.config();
 
 const app = express();
 
+const redisClient = createClient({
+  host: process.env.REDIS_URI,
+  port: 6379,
+});
+
+const RedisStoreClient = new RedisStore({ client: redisClient });
+
 app.set("trust proxy", 1);
 app.use(
   session({
+    store: RedisStoreClient,
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
@@ -42,6 +53,7 @@ app.listen(3000, async () => {
 
     // Connect to database
     await connectDb();
+    await redisConnect(redisClient);
   } catch (error) {
     console.log("Error: ", error);
   }

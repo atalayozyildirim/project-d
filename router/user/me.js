@@ -1,10 +1,24 @@
 import express from "express";
 import UserModel from "../../db/Model/UserModel.js";
+import { createClient } from "redis";
+
 const router = express.Router();
+
+const redisClient = createClient({
+  host: "redis://localhost",
+  port: 6379,
+});
+redisClient.connect().catch((e) => console.log("Redis connection failed"));
 
 router.get("/me", async (req, res) => {
   console.log(req.currentUser);
   try {
+    const cachedUser = await redisClient.get(
+      `session:${req.currentUser.user.id}`
+    );
+    if (cachedUser) {
+      return res.status(200).json({ data: JSON.parse(cachedUser) });
+    }
     const user = await UserModel.find({ userId: req.currentUser.user.id });
 
     if (!user) {

@@ -3,6 +3,13 @@ import bcrypt from "bcrypt";
 import Auth from "../../db/Model/AuthModel.js";
 import { body, validationResult } from "express-validator";
 import { generateJWT, refreshToken } from "../../util/generateJWT.js";
+import { createClient } from "redis";
+
+const redisClient = createClient({
+  host: process.env.REDIS_URI,
+  port: 6379,
+});
+redisClient.connect().catch((e) => console.log("Redis connection failed"));
 
 const router = express.Router();
 
@@ -36,6 +43,19 @@ router.post(
 
     const refresh_token = await refreshToken(token);
 
+    await redisClient.set(
+      `session:${findUser._id}`,
+      JSON.stringify({
+        token,
+        refresh_token,
+        user: {
+          id: findUser._id,
+          email: findUser.email,
+        },
+      }),
+      "EX",
+      60 * 60 * 24 * 7
+    );
     res.cookie("acsess_token", "Bearer " + token, { httpOnly: true });
     res.cookie("refresh_token", "Bearer " + refresh_token, { httpOnly: true });
 
