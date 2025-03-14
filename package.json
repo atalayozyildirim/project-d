@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch index.js",
-    "add": "node ./lib/scripts/populateTestData.js"
+    "add": "node ./lib/scripts/addData.js"
   },
   "author": "Atalay Ozyildirim",
   "license": "MIT",
