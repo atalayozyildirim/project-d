@@ -3,17 +3,20 @@
 ## Kurulum
 
 1. Projeyi klonlayın:
+
     ```bash
     git clone 
     cd project-d
     ```
 
 2. Gerekli bağımlılıkları yükleyin:
+
     ```bash
     npm install
     ```
 
 3. [.env](http://_vscodecontentref_/0) dosyasını oluşturun ve gerekli çevresel değişkenleri ekleyin:
+
     ```properties
     MODE=Development
     SECRET_KEY=your_secret_key
@@ -21,13 +24,17 @@
     JWT_SECRET=your_jwt_secret_key
     ```
 
-4. Docker kullanarak MongoDB'yi başlatın:
+4. Docker kullanarak MongoDB'yi ve Redis'i başlatın:
+
     ```bash
     docker pull mongo
     docker run -d -p 27017:27017 --name my-mongo mongo
+    docker pull redis
+    docker run -d -p 6379:6379 --name redis redis
     ```
 
 5. Sunucuyu başlatın:
+
     ```bash
     npm run dev
     ```
@@ -37,8 +44,9 @@
 ### Auth Routes
 
 - **POST api/auth/login**
-    - Açıklama: Kullanıcı girişi yapar.
-    - Body:
+  - Açıklama: Kullanıcı girişi yapar.
+  - Body:
+
         ```json
         {
           "email": "user@example.com",
@@ -47,8 +55,9 @@
         ```
 
 - **POST api/auth/register**
-    - Açıklama: Yeni kullanıcı kaydı yapar.
-    - Body:
+  - Açıklama: Yeni kullanıcı kaydı yapar.
+  - Body:
+
         ```json
         {
           "name": "John Doe",
@@ -60,14 +69,15 @@
 ### User Routes
 
 - **GET api/user/all**
-    - Açıklama: Tüm kullanıcıları listeler.
-    - Query Params:
-        - `page`: Sayfa numarası (varsayılan: 1)
-        - `limit`: Sayfa başına kullanıcı sayısı (varsayılan: 10)
+  - Açıklama: Tüm kullanıcıları listeler.
+  - Query Params:
+    - `page`: Sayfa numarası (varsayılan: 1)
+    - `limit`: Sayfa başına kullanıcı sayısı (varsayılan: 10)
 
 - **POST api/user/add**
-    - Açıklama: Yeni kullanıcı ekler.
-    - Body:
+  - Açıklama: Yeni kullanıcı ekler.
+  - Body:
+
         ```json
         {
           "name": "Jane Doe",
@@ -77,21 +87,22 @@
         ```
 
 - **DELETE api/user/delete/:id**
-    - Açıklama: Belirtilen ID'ye sahip kullanıcıyı siler.
-    - Params:
-        - `id`: Kullanıcı ID'si
+  - Açıklama: Belirtilen ID'ye sahip kullanıcıyı siler.
+  - Params:
+    - `id`: Kullanıcı ID'si
 
 ### Employer Routes
 
 - **GET api/emp/all**
-    - Açıklama: Tüm işverenleri listeler.
-    - Query Params:
-        - `page`: Sayfa numarası (varsayılan: 1)
-        - `limit`: Sayfa başına işveren sayısı (varsayılan: 10)
+  - Açıklama: Tüm işverenleri listeler.
+  - Query Params:
+    - `page`: Sayfa numarası (varsayılan: 1)
+    - `limit`: Sayfa başına işveren sayısı (varsayılan: 10)
 
 - **POST api/emp/add**
-    - Açıklama: Yeni işveren ekler.
-    - Body:
+  - Açıklama: Yeni işveren ekler.
+  - Body:
+
         ```json
         {
           "name": "Company ABC",
@@ -102,21 +113,22 @@
         ```
 
 - **DELETE api/emp/delete/:id**
-    - Açıklama: Belirtilen ID'ye sahip işvereni siler.
-    - Params:
-        - `id`: İşveren ID'si
+  - Açıklama: Belirtilen ID'ye sahip işvereni siler.
+  - Params:
+    - `id`: İşveren ID'si
 
 ### Customer Routes
 
 - **GET api/customer/all**
-    - Açıklama: Tüm müşterileri listeler.
-    - Query Params:
-        - `page`: Sayfa numarası (varsayılan: 1)
-        - `limit`: Sayfa başına müşteri sayısı (varsayılan: 10)
+  - Açıklama: Tüm müşterileri listeler.
+  - Query Params:
+    - `page`: Sayfa numarası (varsayılan: 1)
+    - `limit`: Sayfa başına müşteri sayısı (varsayılan: 10)
 
 - **POST api/customer/add**
-    - Açıklama: Yeni müşteri ekler.
-    - Body:
+  - Açıklama: Yeni müşteri ekler.
+  - Body:
+
         ```json
         {
           "name": "Customer XYZ",
@@ -128,21 +140,22 @@
         ```
 
 - **DELETE api/customer/delete/:id**
-    - Açıklama: Belirtilen ID'ye sahip müşteriyi siler.
-    - Params:
-        - `id`: Müşteri ID'si
+  - Açıklama: Belirtilen ID'ye sahip müşteriyi siler.
+  - Params:
+    - `id`: Müşteri ID'si
 
 ### Invoice Routes
 
 - **GET api/invoice/all**
-    - Açıklama: Tüm faturaları listeler.
-    - Query Params:
-        - `page`: Sayfa numarası (varsayılan: 1)
-        - `limit`: Sayfa başına fatura sayısı (varsayılan: 10)
+  - Açıklama: Tüm faturaları listeler.
+  - Query Params:
+    - `page`: Sayfa numarası (varsayılan: 1)
+    - `limit`: Sayfa başına fatura sayısı (varsayılan: 10)
 
 - **POST api/invoice/add**
-    - Açıklama: Yeni fatura ekler.
-    - Body:
+  - Açıklama: Yeni fatura ekler.
+  - Body:
+
         ```json
        {
             "invoiceNumber": "INV-002",
@@ -164,17 +177,19 @@
             "total": 6000,
             "status": "pending"
         }
+
       ```
 
 - **DELETE api/invoice/delete/:id**
-    - Açıklama: Belirtilen ID'ye sahip faturayı siler.
-    - Params:
-        - `id`: Fatura ID'si
+  - Açıklama: Belirtilen ID'ye sahip faturayı siler.
+  - Params:
+    - `id`: Fatura ID'si
 
 ## Mail Servisi
 
 ### Mail Routes
- - Kullanıcının sahip oldugu imape gore mail servisi için config verilerini ceker
+
+- Kullanıcının sahip oldugu imape gore mail servisi için config verilerini ceker
 - **GET api/mail/inbox
   - Açıklama: Inbox'taki tüm mailleri listeler.
   - Response:
@@ -444,12 +459,21 @@ curl -X GET http://localhost:3000/api/chart/total
         }
         ```
 
+## AI Analiz Route
 
+- **GET api/ai/monthly/sales/analyze**
+- Açıklama: Invoice db verileri ile gelecek ay satış analizi yapar
 
+- **GET api/customer/analyze/totalSpent**
+  - Açıklama: Customer Db veriler ile müşterilerin gelecek ayın toplam satış hacmini tahmin eder
+
+- **GET api/task/recommendations/:userId**
+  - Açıklama:  Kullanıcılara yapılcak olan task öğelerini önerir
+  
 ## Middleware
 
 - **currentUser**
-    - Açıklama: Geçerli kullanıcıyı doğrular ve kullanıcı bilgilerini request objesine ekler.
+  - Açıklama: Geçerli kullanıcıyı doğrular ve kullanıcı bilgilerini request objesine ekler.
 
 ## Modeller
 
@@ -458,7 +482,7 @@ curl -X GET http://localhost:3000/api/chart/total
 - **name**: String, required
 - **email**: String, required, unique
 - **password**: String, required
-- **token**: String, 
+- **token**: String,
 optional- **role**: String, optional, default: "user"
 
 ### CustomerModel
