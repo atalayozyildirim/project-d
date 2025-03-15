@@ -9,6 +9,7 @@ import charts from "./chart/chart.js";
 import taskRouter from "./tasks/tasks.js";
 import commentRouter from "./comment/comment.js";
 import aiRouter from "./ai/index.js";
+import notification from "./notfications/index.js";
 import { currentUser } from "../middleware/currentUser.js";
 
 const router = express.Router();
@@ -23,5 +24,6 @@ router.use("/task", currentUser, taskRouter);
 router.use("/comment", currentUser, commentRouter);
 router.use("/ai", currentUser, aiRouter);
 router.use("/mail", currentUser, mailRouter);
+router.use("/notification", currentUser, notification);
 
 export default router;

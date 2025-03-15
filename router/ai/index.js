@@ -2,6 +2,7 @@ import express from "express";
 import * as tf from "@tensorflow/tfjs-node";
 import Invoice from "../../db/Model/InvoiceModel.js";
 import CustomerModel from "../../db/Model/CustomerModel.js";
+import TaskModel from "../../db/Model/Task.js";
 
 const router = express.Router();
 
@@ -54,12 +55,10 @@ router.get("/monthly/sales/analyze", async (req, res) => {
     // Tahmin edilen değeri denormalize ediyoruz
     const denormalizedPrediction = prediction[0][0] * maxSales;
 
-    res
-      .status(200)
-      .json({
-        nextMonth: nextMonth + 1,
-        nextMontlySales: denormalizedPrediction,
-      });
+    res.status(200).json({
+      nextMonth: nextMonth + 1,
+      nextMontlySales: denormalizedPrediction,
+    });
   } catch (error) {
     // Hata durumunda hata mesajını döndürüyoruz
     console.error("Error during analysis route:", error);
@@ -127,4 +126,60 @@ router.get("/customer/analyze/totalSpent", async (req, res) => {
   }
 });
 
+router.get("/task/recommendations/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const userTask = await TaskModel.find({ assignedTo: userId });
+
+    if (userTask.length === 0) {
+      return res.status(404).json({ message: "No task found for this user" });
+    }
+
+    const taskDescription = userTask.map((task) => task.description);
+    const taskStatus = userTask.map((task) => task.status);
+
+    const inpoutTensor = tf.tensor2d(
+      taskStatus.map((status) => {
+        switch (status) {
+          case "pending":
+            return [1, 0, 0];
+          case "in-progress":
+            return [0, 1, 0];
+          case "completed":
+            return [0, 0, 1];
+          default:
+            return [0, 0, 0];
+        }
+      }),
+      [taskStatus.length, 3]
+    );
+
+    const model = tf.sequential();
+    model.add(
+      tf.layerss.dense({ units: 10, activation: "relu", inputShape: [3] })
+    );
+    model.add(tf.layers.dense({ units: 3, activation: "softmax" }));
+
+    await model.fit(inpoutTensor, inpoutTensor, { epochs: 100 });
+
+    const recommendations = model.predict(inpoutTensor).arraySync();
+
+    const recommendedTasks = recommendations.map((rec, index) => ({
+      description: taskDescription[index],
+      status:
+        rec.indexOf(Math.max(...rec)) === 0
+          ? "pending"
+          : rec.indexOf(Math.max(...rec)) === 1
+          ? "in-progress"
+          : "completed",
+    }));
+
+    return res.status(200).json({ recommended });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: err.message });
+  }
+});
 export default router;
