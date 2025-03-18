@@ -22,6 +22,7 @@
     SECRET_KEY=your_secret_key
     MONGO_URI=mongodb://localhost:27017/project
     JWT_SECRET=your_jwt_secret_key
+    REDIS_URI ="redis://localhost"
     ```
 
 4. Docker kullanarak MongoDB'yi ve Redis'i başlatın:
