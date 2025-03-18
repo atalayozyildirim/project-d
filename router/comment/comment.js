@@ -1,6 +1,7 @@
 import express from "express";
 import { body, param, validationResult } from "express-validator";
 import Task from "../../db/Model/Task.js";
+import { MyWebSocketInstance } from "../../lib/websocket/webSocket.js";
 
 const router = express.Router();
 
@@ -51,6 +52,8 @@ router.post(
       }
 
       task.comments.push({ user: userId, comment });
+
+      MyWebSocketInstance.io.emit("TaskComment", task);
 
       await task.save();
 

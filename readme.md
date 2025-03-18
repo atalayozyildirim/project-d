@@ -385,7 +385,7 @@ curl -X GET http://localhost:3000/api/chart/total
 
 ### Task Routes
 
-- **POST api/tasks/add**
+- **POST api/task/add**
   - Açıklama: Yeni bir görev ekler.
   - Body:
 
@@ -393,7 +393,9 @@ curl -X GET http://localhost:3000/api/chart/total
         {
           "title": "Görev Başlığı",
           "description": "Görev Açıklaması",
-          "status": "pendig",
+          "assignedTo" : "10031093124",
+          "priority": "low | medium | high",
+          "status": "pending",
           "dueDate": "2025-03-15"
         }
         ```

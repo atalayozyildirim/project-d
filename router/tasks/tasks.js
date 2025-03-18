@@ -1,13 +1,20 @@
 import express from "express";
 import Task from "../../db/Model/Task.js";
 import { body, validationResult } from "express-validator";
-
+import { MyWebSocketInstance } from "../../lib/websocket/webSocket.js";
 const router = express.Router();
 
 router.post(
   "/add",
   [
     body("title").isString().notEmpty().withMessage("Title required !"),
+    body("priority")
+      .isIn(["low", "medium", "high"])
+      .withMessage("Priority required value [low,high,medium] !"),
+    body("assignedTo")
+      .isMongoId()
+      .notEmpty()
+      .withMessage("AssignedTo required  Mongo Object ID!"),
     body("description")
       .isString()
       .notEmpty()
@@ -21,15 +28,25 @@ router.post(
       return res.status(400).json({ errors: err.array() });
     }
     try {
-      const { title, description, status, dueDate } = req.body;
+      const { title, description, status, dueDate, assignedTo, priority } =
+        req.body;
 
       const task = new Task({
         title,
         description,
         status,
         dueDate,
+        assignedTo,
+        priority,
       });
 
+      await MyWebSocketInstance.sendNotification(
+        {
+          title: "You have been assigned a new task",
+          message: `Task ${task.title} has been assigned to you`,
+        },
+        assignedTo
+      );
       await task.save();
       res.status(201).json(task);
     } catch (error) {
@@ -77,6 +94,14 @@ router.put(
       }
 
       task.status = req.body.status;
+
+      const message = {
+        title: "Task status updated",
+        message: `Task ${task.title} status has been updated to ${
+          task.status == "completed" ? "completed" : "in progress"
+        }`,
+      };
+      await MyWebSocketInstance.sendNotification(message, task.assignedTo);
 
       await task.save();
 

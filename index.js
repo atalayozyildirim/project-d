@@ -6,13 +6,11 @@ import dotenv from "dotenv";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import router from "./router/main.js";
-import eiows from "eiows";
-import { Server } from "socket.io";
 import { connectDb } from "./db/ConnectDb.js";
 import { createClient } from "redis";
 import { RedisStore } from "connect-redis";
 import { redisConnect } from "./db/redis/redisConnect.js";
-import { connectWebSocket } from "./lib/websocket/webSocket.js";
+import { MyWebSocketInstance } from "./lib/websocket/webSocket.js";
 
 dotenv.config();
 
@@ -59,8 +57,9 @@ const server = app.listen(3000, async () => {
     // Conenct to Redis
     await redisConnect(redisClient);
 
-    // WebSocket
-    await connectWebSocket(server);
+    // Connect to WebSocket
+
+    await MyWebSocketInstance.connect(server);
   } catch (error) {
     console.log("Error: ", error);
   }
