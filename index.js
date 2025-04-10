@@ -16,6 +16,9 @@ dotenv.config();
 
 const app = express();
 
+if (process.env.REDIS_URI === undefined) {
+  throw new Error("REDIS_URI is not defined");
+}
 const redisClient = createClient({
   host: process.env.REDIS_URI,
   port: 6379,
@@ -40,7 +43,15 @@ app.use(
   })
 );
 app.use(cookieParser());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Frontend'in çalıştığı domain
+    credentials: true, // Çerezlerin gönderilmesine izin verir
+    exposedHeaders: ["set-cookie"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(helmet());
 app.use(morgan("tiny"));
 app.use(express.json());
