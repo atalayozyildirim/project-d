@@ -45,7 +45,7 @@ app.use(
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173", // Frontend'in çalıştığı domain
+    origin: "http://localhost:5173",
     credentials: true,
     exposedHeaders: ["set-cookie"],
     methods: ["GET", "POST", "PUT", "DELETE"],
