@@ -21,7 +21,7 @@ if (process.env.REDIS_URI === undefined) {
 }
 const redisClient = createClient({
   host: process.env.REDIS_URI,
-  port: 6379,
+  port: process.env.REDIS_PORT,
 });
 
 const RedisStoreClient = new RedisStore({ client: redisClient });
