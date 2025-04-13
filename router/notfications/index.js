@@ -11,6 +11,7 @@ const router = express.Router();
 router.get("/me", async (req, res) => {
   try {
     const userId = req.currentUser.user.id;
+    console.log("userId", userId);
 
     if (!userId) {
       return res.status(401).send({ message: "Not authorized" });
