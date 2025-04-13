@@ -1,5 +1,6 @@
 import express from "express";
 import Task from "../../db/Model/Task.js";
+import UserModel from "../../db/Model/UserModel.js";
 import { body, validationResult } from "express-validator";
 import { MyWebSocketInstance } from "../../lib/websocket/webSocket.js";
 const router = express.Router();
@@ -57,7 +58,11 @@ router.post(
 
 router.get("/all", async (req, res) => {
   try {
-    const tasks = await Task.find();
+    const tasks = await Task.find({}).populate("assignedTo");
+    if (!tasks) {
+      return res.status(404).json({ message: "Tasks not found !" });
+    }
+
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ message: "Error Server !" });
@@ -112,6 +117,15 @@ router.put(
   }
 );
 
+router.get("/user/list", async (req, res) => {
+  const data = await UserModel.find({}).select("name");
+
+  if (!data) {
+    return res.status(404).json({ message: "Users not found !" });
+  }
+
+  res.status(200).json(data);
+});
 router.delete("/delete/:id", async (req, res) => {
   try {
     const task = await Task.findByIdAndDelete(req.params.id);
