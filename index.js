@@ -45,7 +45,10 @@ app.use(
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://project-d-hmdvhgfacahjc7gj.francecentral-01.azurewebsites.net",
+    ],
     credentials: true,
     exposedHeaders: ["set-cookie"],
     methods: ["GET", "POST", "PUT", "DELETE"],
