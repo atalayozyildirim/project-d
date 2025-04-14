@@ -6,9 +6,14 @@ import { generateJWT, refreshToken } from "../../util/generateJWT.js";
 import { createClient } from "redis";
 
 const redisClient = createClient({
-  host: process.env.REDIS_URI,
-  port: 6379,
-});
+  username: process.env.REDIS_USERNAME,
+  password: process.env.REDIS_PASSWORD,
+
+  socket: {
+    host: process.env.REDIS_URI,
+    port: process.env.REDIS_PORT,
+  },
+})
 redisClient.connect().catch((e) => console.log("Redis connection failed"));
 
 const router = express.Router();
