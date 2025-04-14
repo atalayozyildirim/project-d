@@ -22,8 +22,11 @@ if (process.env.REDIS_URI === undefined) {
 const redisClient = createClient({
   username: process.env.REDIS_USERNAME,
   password: process.env.REDIS_PASSWORD,
-  host: process.env.REDIS_URI,
-  port: process.env.REDIS_PORT,
+
+  socket: {
+    host: process.env.REDIS_URI,
+    port: process.env.REDIS_PORT,
+  },
 });
 
 const RedisStoreClient = new RedisStore({ client: redisClient });
@@ -54,6 +57,9 @@ app.use(
       "https://atalay.studio",
       "https://www.atalay.studio",
       "http://atalay.studio",
+      "http://localhost:3000",
+      "http://api.atalay.studio",
+      "https://api.atalay.studio",
     ],
     credentials: true,
     exposedHeaders: ["set-cookie"],
