@@ -47,7 +47,11 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://project-d-hmdvhgfacahjc7gj.francecentral-01.azurewebsites.net",
+      "www.atalay.studio",
+      "atalay.studio",
+      "https://atalay.studio",
+      "https://www.atalay.studio",
+      "http://atalay.studio",
     ],
     credentials: true,
     exposedHeaders: ["set-cookie"],
