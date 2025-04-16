@@ -21,8 +21,7 @@ const InvoiceSchema = new mongoose.Schema({
     type: [
       {
         productID: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
+          type: Number,
           required: true,
         },
         description: String,

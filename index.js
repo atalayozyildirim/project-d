@@ -20,13 +20,8 @@ if (process.env.REDIS_URI === undefined) {
   throw new Error("REDIS_URI is not defined");
 }
 const redisClient = createClient({
-  username: process.env.REDIS_USERNAME,
-  password: process.env.REDIS_PASSWORD,
-
-  socket: {
-    host: process.env.REDIS_URI,
-    port: process.env.REDIS_PORT,
-  },
+  host: process.env.REDIS_URI,
+  port: process.env.REDIS_PORT,
 });
 
 const RedisStoreClient = new RedisStore({ client: redisClient });

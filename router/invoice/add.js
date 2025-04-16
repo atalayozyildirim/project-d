@@ -54,12 +54,12 @@ router.post(
 
     const newInvoice = new InvoiceModel({
       invoiceNumber,
-      invoiceDate,
+      invoiceDate: invoiceDate || new Date(),
       customerName,
       customerAddress,
       items,
       total,
-      status,
+      status: status || "Pending",
     });
     await newInvoice.save();
 
