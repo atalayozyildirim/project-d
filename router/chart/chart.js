@@ -51,10 +51,62 @@ router.get("/totalInvoicesByMonth", async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
-
 router.get("/total/sales", async (req, res) => {
   try {
-    const salesTotal = await Employer.aggregate([
+    const currentYear = new Date().getFullYear();
+
+    const salesTotal = await Invoice.aggregate([
+      {
+        $match: {
+          invoiceDate: {
+            $gte: new Date(`${currentYear}`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { month: { $month: "$invoiceDate" } }, // Ay bazında gruplama
+          totalSales: { $sum: "$total" },
+        },
+      },
+      {
+        $sort: { "_id.month": 1 },
+      },
+    ]);
+
+    const monthSales = Array(12).fill(0);
+    salesTotal.forEach((sale) => {
+      monthSales[sale._id.month - 1] = sale.totalSales;
+    });
+
+    return res.status(200).json(monthSales);
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/monthGain", async (req, res) => {
+  try {
+    const startOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    );
+    const endOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth() + 1,
+      1
+    );
+    const employerSalary = await Employer.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: startOfMonth,
+            $lt: endOfMonth,
+          },
+        },
+      },
       {
         $group: {
           _id: null,
@@ -62,27 +114,65 @@ router.get("/total/sales", async (req, res) => {
         },
       },
     ]);
-    if (salesTotal.length > 0) {
-      return res.status(200).json({ totalSalary: salesTotal[0].totalSalary });
-    } else {
-      return res.status(200).json({ totalSalary: 0 });
-    }
-  } catch {
+
+    const salesTotal = await Invoice.aggregate([
+      {
+        $match: {
+          invoiceDate: {
+            $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            $lt: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth() + 1,
+              1
+            ),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { month: { $month: "$invoiceDate" } },
+          totalSales: { $sum: "$total" },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      gain: salesTotal[0].totalSales,
+      expense: employerSalary[0].totalSalary,
+    });
+  } catch (error) {
+    console.error("Error:", error);
     return res.status(500).json({ message: "Server error" });
   }
 });
+
 router.get("/monthSalesRevenue", async (req, res) => {
   try {
+    const currentYear = new Date().getFullYear();
+
     const monthlyRevenue = await Invoice.aggregate([
       {
+        $match: {
+          invoiceDate: {
+            $gte: new Date(`${currentYear}`),
+          },
+        },
+      },
+      {
         $group: {
-          _id: { $month: "$invoiceDate" },
+          _id: { month: { $month: "$invoiceDate" } },
           totalRevenue: { $sum: "$total" },
         },
       },
     ]);
     if (monthlyRevenue.length > 0) {
-      return res.status(200).json(monthlyRevenue);
+      const monthRevenue = Array(12).fill(0);
+
+      monthlyRevenue.forEach((revenue) => {
+        monthRevenue[revenue._id.month - 1] = revenue.totalRevenue;
+      });
+
+      return res.status(200).json(monthRevenue);
     } else {
       return res.status(200).json([]);
     }
@@ -92,21 +182,36 @@ router.get("/monthSalesRevenue", async (req, res) => {
 });
 router.get("/newCustomersByMonth", async (req, res) => {
   try {
+    const currentYear = new Date().getFullYear();
+
     const newCustomers = await Customer.aggregate([
       {
+        $match: {
+          createdAt: {
+            $gte: new Date(`${currentYear}`),
+            $lte: new Date(`${currentYear + 1}`),
+          },
+        },
+      },
+      {
         $group: {
-          _id: { $month: "$createdAt" },
+          _id: { month: { $month: "$createdAt" } },
           total: { $sum: 1 },
         },
       },
     ]);
     if (newCustomers.length > 0) {
-      return res.status(200).json(newCustomers);
+      const monthCustomers = Array(12).fill(0);
+
+      newCustomers.forEach((customer) => {
+        monthCustomers[customer._id.month - 1] = customer.total;
+      });
+      return res.status(200).json(monthCustomers);
     } else {
       return res.status(200).json([]);
     }
-  } catch {
-    return res.status(500).json({ message: "Server error" });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error: error });
   }
 });
 
