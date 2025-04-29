@@ -1,6 +1,7 @@
 import express from "express";
 import { body, param, validationResult } from "express-validator";
 import Task from "../../db/Model/Task.js";
+import Auth from "../../db/Model/AuthModel.js";
 import { MyWebSocketInstance } from "../../lib/websocket/webSocket.js";
 
 const router = express.Router();
@@ -47,11 +48,18 @@ router.post(
     try {
       const task = await Task.findById(taskId);
 
+      console.log(task);
       if (!task) {
         return res.status(400).json({ message: "Task not found" });
       }
 
-      task.comments.push({ user: userId, comment });
+      const user = await Auth.findById(userId);
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      console.log(user);
+      task.comments.push({ user: userId, name: user.name, comment });
 
       MyWebSocketInstance.io.emit("TaskComment", task);
 
@@ -59,7 +67,7 @@ router.post(
 
       res.status(201).json({ message: "Comment added", data: task.comments });
     } catch (err) {
-      return res.status(400).json({ message: "Task not found" });
+      return res.status(400).json({ message: "Task not found", err });
     }
   }
 );
