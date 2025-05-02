@@ -136,6 +136,15 @@ router.get("/monthGain", async (req, res) => {
       },
     ]);
 
+    if (salesTotal.length === 0 || employerSalary.length === 0) {
+      return res.status(200).json({
+        gain: salesTotal[0]?.totalSales || 0,
+        expense: employerSalary[0]?.totalSalary || 0,
+      });
+    }
+
+    console.log("salesTotal", salesTotal);
+    console.log("employerSalary", employerSalary);
     return res.status(200).json({
       gain: salesTotal[0].totalSales,
       expense: employerSalary[0].totalSalary,
