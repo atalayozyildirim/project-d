@@ -9,18 +9,13 @@ const router = express.Router();
 
 router.get(
   "/:field/:value",
-  param("field").isIn([
-    "invoice",
-    "customer",
-    "personel",
-    "task",
-    param("value").isString().isLength({ min: 1 }).trim(),
-  ]),
+  param("field").isString(),
+  param("value").isString().isLength({ min: 1 }).trim(),
 
   async (req, res) => {
     const { field, value } = req.params;
 
-    if (validationResult(req).isEmpty()) {
+    if (!validationResult(req)) {
       return res.status(400).json({ error: "Invalid search parameters" });
     }
     try {
@@ -34,7 +29,6 @@ router.get(
               { invoiceNumber: { $regex: sanitizedValue, $options: "i" } },
               { customerName: { $regex: sanitizedValue, $options: "i" } },
               { status: { $regex: sanitizedValue, $options: "i" } },
-              { date: { $regex: sanitizedValue, $options: "i" } },
             ],
           });
           break;
@@ -64,7 +58,6 @@ router.get(
               { title: { $regex: sanitizedValue, $options: "i" } },
               { description: { $regex: sanitizedValue, $options: "i" } },
               { status: { $regex: sanitizedValue, $options: "i" } },
-              { dueDate: { $regex: sanitizedValue, $options: "i" } },
             ],
           });
           break;
