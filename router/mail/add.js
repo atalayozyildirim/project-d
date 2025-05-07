@@ -64,7 +64,11 @@ router.post(
 
     const exist = await MailData.findOne({ userId: req.currentUser.user.id });
     if (exist) {
-      return res.status(400).json({ message: "Mail Service already exist !" });
+      return res
+        .status(400)
+        .json({
+          message: "Mail Service already exist,You go to update mail !",
+        });
     }
     const mail = new MailData({
       userId: req.currentUser.user.id,

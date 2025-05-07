@@ -26,7 +26,14 @@ router.get("/inbox", async (req, res) => {
       },
     };
 
-    const connection = await imaps.connect(config);
+    let connection;
+
+    if (!global.imapConnection) {
+      connection = await imaps.connect(config);
+      global.imapConnection = connection;
+    } else {
+      connection = global.imapConnection;
+    }
 
     await connection.openBox("INBOX");
 
@@ -34,6 +41,8 @@ router.get("/inbox", async (req, res) => {
     const fetchOptions = {
       bodies: ["HEADER", "TEXT"],
       markSeen: true,
+      struct: true,
+      limit: 50,
     };
 
     const messages = await connection.search(searchCriteria, fetchOptions);
