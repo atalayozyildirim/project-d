@@ -11,6 +11,10 @@ router.get("/monthly/sales/analyze", async (req, res) => {
     // Invoice modelinden tüm faturaları alıyoruz
     const invoices = await Invoice.find();
 
+    if (invoices.length === 0) {
+      return res.status(404).json({ message: "No invoices found" });
+    }
+    // Faturaları tarih sırasına göre sıralıyoruz
     // Aylık satış verilerini hesaplıyoruz
     const monthlySales = invoices.reduce((acc, invoice) => {
       const month = new Date(invoice.invoiceDate).getMonth(); // Fatura tarihinden ayı alıyoruz
@@ -72,6 +76,9 @@ router.get("/customer/analyze/totalSpent", async (req, res) => {
   try {
     const customers = await CustomerModel.find();
 
+    if (customers.length === 0) {
+      return res.status(404).json({ message: "No customers found" });
+    }
     const customerTotalSpent = customers.map((customer) => {
       const totalSpent = customer.purchases.reduce((acc, purchase) => {
         return acc + purchase.total;
@@ -132,14 +139,14 @@ router.get("/task/recommendations/:userId", async (req, res) => {
 
     const userTask = await TaskModel.find({ assignedTo: userId });
 
-    if (userTask.length === 0) {
-      return res.status(404).json({ message: "No task found for this user" });
+    if (!userTask || userTask.length === 0) {
+      return res.status(404).json({ message: "No tasks found for this user" });
     }
 
     const taskDescription = userTask.map((task) => task.description);
     const taskStatus = userTask.map((task) => task.status);
 
-    const inpoutTensor = tf.tensor2d(
+    const inputTensor = tf.tensor2d(
       taskStatus.map((status) => {
         switch (status) {
           case "pending":
@@ -157,13 +164,13 @@ router.get("/task/recommendations/:userId", async (req, res) => {
 
     const model = tf.sequential();
     model.add(
-      tf.layerss.dense({ units: 10, activation: "relu", inputShape: [3] })
+      tf.layers.dense({ units: 10, activation: "relu", inputShape: [3] })
     );
     model.add(tf.layers.dense({ units: 3, activation: "softmax" }));
 
-    await model.fit(inpoutTensor, inpoutTensor, { epochs: 100 });
+    await model.fit(inputTensor, inputTensor, { epochs: 100 });
 
-    const recommendations = model.predict(inpoutTensor).arraySync();
+    const recommendations = model.predict(inputTensor).arraySync();
 
     const recommendedTasks = recommendations.map((rec, index) => ({
       description: taskDescription[index],
@@ -175,8 +182,9 @@ router.get("/task/recommendations/:userId", async (req, res) => {
           : "completed",
     }));
 
-    return res.status(200).json({ recommended });
+    return res.status(200).json({ recommended: recommendedTasks });
   } catch (err) {
+    console.error("Error during task recommendations:", err);
     return res
       .status(500)
       .json({ message: "Internal Server Error", error: err.message });
