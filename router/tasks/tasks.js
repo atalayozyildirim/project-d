@@ -32,6 +32,11 @@ router.post(
       const { title, description, status, dueDate, assignedTo, priority } =
         req.body;
 
+      const user = await UserModel.findById(assignedTo);
+      if (!user) {
+        return res.status(404).json({ message: "User not found !" });
+      }
+
       const task = new Task({
         title,
         description,
@@ -41,12 +46,13 @@ router.post(
         priority,
       });
 
+      console.log("task", user.userId.valueOf());
       await MyWebSocketInstance.sendNotification(
         {
           title: "You have been assigned a new task",
           message: `Task ${task.title} has been assigned to you`,
         },
-        assignedTo
+        user.userId.valueOf()
       );
       await task.save();
       res.status(201).json(task);
