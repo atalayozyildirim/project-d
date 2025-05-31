@@ -26,16 +26,28 @@ router.get("/inbox", async (req, res) => {
       },
     };
 
+    console.log("IMAP Bağlantı Ayarları:", {
+      host: mailData.host,
+      port: mailData.port,
+      user: mailData.user,
+      // Güvenlik için şifreyi loglamıyoruz
+    });
+
     let connection;
 
     if (!global.imapConnection) {
+      console.log("Yeni IMAP bağlantısı oluşturuluyor...");
       connection = await imaps.connect(config);
       global.imapConnection = connection;
+      console.log("IMAP bağlantısı başarılı");
     } else {
+      console.log("Mevcut IMAP bağlantısı kullanılıyor");
       connection = global.imapConnection;
     }
 
+    console.log("INBOX açılıyor...");
     await connection.openBox("INBOX");
+    console.log("INBOX başarıyla açıldı");
 
     const searchCriteria = ["ALL"];
     const fetchOptions = {
@@ -70,7 +82,12 @@ router.get("/inbox", async (req, res) => {
     await connection.end();
     res.status(200).json(emails);
   } catch (error) {
-    return res.status(500).json({ message: "Server error", error });
+    console.error("Mail alma hatası:", error);
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
+      stack: error.stack,
+    });
   }
 });
 

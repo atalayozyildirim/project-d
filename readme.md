@@ -18,11 +18,12 @@
 3. [.env](http://_vscodecontentref_/0) dosyasını oluşturun ve gerekli çevresel değişkenleri ekleyin:
 
     ```properties
-    MODE=Development
-    SECRET_KEY=your_secret_key
-    MONGO_URI=mongodb://localhost:27017/project
-    JWT_SECRET=your_jwt_secret_key
-    REDIS_URI ="redis://localhost"
+        MODE=Development
+        SECRET_KEY=your_secret_key
+        MONGO_URI=mongodb://localhost:27017/project
+        JWT_SECRET=your_jwt_secret_key
+        REDIS_URI ="redis://localhost"
+        REDIS_PORT=6379
     ```
 
 4. Docker kullanarak MongoDB'yi ve Redis'i başlatın:

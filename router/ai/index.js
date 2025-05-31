@@ -1,5 +1,5 @@
 import express from "express";
-import * as tf from "@tensorflow/tfjs-node";
+import * as tf from "@tensorflow/tfjs";
 import Invoice from "../../db/Model/InvoiceModel.js";
 import CustomerModel from "../../db/Model/CustomerModel.js";
 import TaskModel from "../../db/Model/Task.js";
@@ -8,67 +8,101 @@ const router = express.Router();
 
 router.get("/monthly/sales/analyze", async (req, res) => {
   try {
-    // Invoice modelinden tüm faturaları alıyoruz
     const invoices = await Invoice.find();
 
     if (invoices.length === 0) {
       return res.status(404).json({ message: "No invoices found" });
     }
-    // Faturaları tarih sırasına göre sıralıyoruz
-    // Aylık satış verilerini hesaplıyoruz
-    const monthlySales = invoices.reduce((acc, invoice) => {
-      const month = new Date(invoice.invoiceDate).getMonth(); // Fatura tarihinden ayı alıyoruz
-      acc[month] = (acc[month] || 0) + invoice.total; // Her ay için toplam satışları hesaplıyoruz
-      return acc;
-    }, {});
 
-    // Aylık satış verilerini TensorFlow.js ile kullanmak için hazırlıyoruz
-    const months = Object.keys(monthlySales).map(Number); // Ayları sayısal değerlere çeviriyoruz
-    const sales = Object.values(monthlySales); // Satışları alıyoruz
-
-    // Verileri normalize ediyoruz
-    const maxSales = Math.max(...sales);
-    const normalizedSales = sales.map((sale) => sale / maxSales);
-
-    // TensorFlow.js ile veri analizi ve model eğitimi yapıyoruz
-    const inputTensor = tf.tensor2d(months, [months.length, 1]); // Ayları tensor formatına çeviriyoruz
-    const outputTensor = tf.tensor2d(normalizedSales, [
-      normalizedSales.length,
-      1,
-    ]); // Normalize edilmiş satışları tensor formatına çeviriyoruz
-
-    // Modeli oluşturuyoruz
-    const model = tf.sequential();
-    model.add(
-      tf.layers.dense({ units: 10, activation: "relu", inputShape: [1] }) // İlk katman: 10 nöronlu, ReLU aktivasyon fonksiyonlu
-    );
-    model.add(tf.layers.dense({ units: 1 })); // İkinci katman: 1 nöronlu
-
-    // Modeli derliyoruz
-    model.compile({ optimizer: "sgd", loss: "meanSquaredError" }); // Optimizasyon algoritması: Stokastik gradyan inişi, Kayıp fonksiyonu: Ortalama kare hatası
-
-    // Modeli eğitiyoruz
-    await model.fit(inputTensor, outputTensor, { epochs: 100 }); // Eğitim: 100 epoch
-
-    // Tahmin yapıyoruz
-    const nextMonth = months.length; // Bir sonraki ayı belirliyoruz
-    const prediction = model
-      .predict(tf.tensor2d([nextMonth], [1, 1])) // Bir sonraki ay için tahmin yapıyoruz
-      .arraySync(); // Tahmin sonucunu array formatına çeviriyoruz
-
-    // Tahmin edilen değeri denormalize ediyoruz
-    const denormalizedPrediction = prediction[0][0] * maxSales;
-
-    res.status(200).json({
-      nextMonth: nextMonth + 1,
-      nextMontlySales: denormalizedPrediction,
+    // Aylık satış verilerini hazırla
+    const monthlyData = new Array(12).fill(0);
+    invoices.forEach((invoice) => {
+      if (invoice.invoiceDate && typeof invoice.total === "number") {
+        const month = new Date(invoice.invoiceDate).getMonth();
+        monthlyData[month] += invoice.total;
+      }
     });
+
+    // Geçerli veri kontrolü
+    const validMonths = monthlyData.filter((amount) => amount > 0);
+    if (validMonths.length === 0) {
+      return res.status(400).json({ message: "No valid sales data found" });
+    }
+
+    // Veriyi normalize et
+    const maxSales = Math.max(...monthlyData);
+    const normalizedData = monthlyData.map((sale) => sale / maxSales);
+
+    try {
+      // Model oluştur
+      const model = tf.sequential();
+
+      // Giriş katmanı
+      model.add(
+        tf.layers.dense({
+          units: 8,
+          activation: "relu",
+          inputShape: [1],
+        })
+      );
+
+      // Çıkış katmanı
+      model.add(
+        tf.layers.dense({
+          units: 1,
+        })
+      );
+
+      // Modeli derle
+      model.compile({
+        optimizer: "adam",
+        loss: "meanSquaredError",
+      });
+
+      // Eğitim verilerini hazırla
+      const xs = tf.tensor1d(Array.from({ length: 12 }, (_, i) => i));
+      const ys = tf.tensor1d(normalizedData);
+
+      // Modeli eğit
+      await model.fit(xs, ys, {
+        epochs: 100,
+        verbose: 0,
+      });
+
+      // Tahmin yap
+      const nextMonth = 12; // Bir sonraki ay
+      const prediction = model.predict(tf.tensor1d([nextMonth]));
+      const predictedValue = await prediction.data();
+      const denormalizedPrediction = predictedValue[0] * maxSales;
+
+      // Belleği temizle
+      xs.dispose();
+      ys.dispose();
+      prediction.dispose();
+      model.dispose();
+
+      res.status(200).json({
+        nextMonth: nextMonth + 1,
+        nextMontlySales: denormalizedPrediction,
+        confidence:
+          1 -
+          Math.abs(
+            predictedValue[0] - normalizedData[normalizedData.length - 1]
+          ),
+      });
+    } catch (tensorError) {
+      console.error("TensorFlow error:", tensorError);
+      return res.status(500).json({
+        message: "Error during tensor operations",
+        error: tensorError.message,
+      });
+    }
   } catch (error) {
-    // Hata durumunda hata mesajını döndürüyoruz
     console.error("Error during analysis route:", error);
-    res
-      .status(500)
-      .json({ message: "Internal Server Error", error: error.message });
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 });
 
@@ -140,7 +174,7 @@ router.get("/task/recommendations/:userId", async (req, res) => {
     const userTask = await TaskModel.find({ assignedTo: userId });
 
     if (!userTask || userTask.length === 0) {
-      return res.status(404).json({ message: "No tasks found for this user" });
+      return res.status(400).json({ message: "No tasks found for this user" });
     }
 
     const taskDescription = userTask.map((task) => task.description);

@@ -20,12 +20,22 @@ router.post(
 
       const { user, password, host, port } = req.body;
 
-      const existImap = await ImapEmail.findOne({ user });
+      const existImap = await ImapEmail.findOne({
+        userId: req.currentUser.user.id,
+      });
+
+      console.log("Mevcut IMAP kaydı:", existImap);
+
       if (existImap) {
-        return res
-          .status(400)
-          .json({ errors: [{ msg: "IMAP Email Service already exist !" }] });
+        return res.status(400).json({
+          errors: [
+            {
+              msg: "Bu kullanıcı için zaten bir IMAP e-posta servisi kayıtlı!",
+            },
+          ],
+        });
       }
+
       const mail = new ImapEmail({
         userId: req.currentUser.user.id,
         user,
@@ -64,11 +74,9 @@ router.post(
 
     const exist = await MailData.findOne({ userId: req.currentUser.user.id });
     if (exist) {
-      return res
-        .status(400)
-        .json({
-          message: "Mail Service already exist,You go to update mail !",
-        });
+      return res.status(400).json({
+        message: "Mail Service already exist,You go to update mail !",
+      });
     }
     const mail = new MailData({
       userId: req.currentUser.user.id,
