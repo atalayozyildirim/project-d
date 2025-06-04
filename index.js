@@ -27,6 +27,7 @@ const redisClient = createClient({
 const RedisStoreClient = new RedisStore({ client: redisClient });
 
 app.set("trust proxy", 1);
+
 app.use(
   session({
     store: RedisStoreClient,
@@ -76,7 +77,6 @@ app.use(
 app.use(morgan("tiny"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use("/api", router);
 
 const server = app.listen(3000, async () => {

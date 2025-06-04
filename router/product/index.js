@@ -39,8 +39,7 @@ router.get("/list", async (req, res, next) => {
   try {
     const products = await Product.find();
     res.status(200).json({
-      message: "Products retrieved successfully",
-      data: products,
+      products,
     });
   } catch (error) {
     res.status(500).json({ errors: [{ msg: "Server Error" }] });
