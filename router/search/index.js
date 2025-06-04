@@ -9,8 +9,8 @@ const router = express.Router();
 
 router.get(
   "/:field/:value",
-  param("field").isString(),
-  param("value").isString().isLength({ min: 1 }).trim(),
+  param("field").isString().escape(),
+  param("value").isString().isLength({ min: 1 }).trim().escape(),
 
   async (req, res) => {
     const { field, value } = req.params;

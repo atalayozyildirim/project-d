@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get(
   "/get/:id",
-  param("id").isMongoId().withMessage("Not valid params"),
+  param("id").isMongoId().withMessage("Not valid params").escape(),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -32,9 +32,12 @@ router.get(
 router.post(
   "/add",
   [
-    body("taskId").isMongoId().withMessage("Not valid is task id"),
-    body("userId").isMongoId().withMessage("Not valid is user id"),
-    body("comment").isString().withMessage("Not valid is comment type"),
+    body("taskId").isMongoId().withMessage("Not valid is task id").escape(),
+    body("userId").isMongoId().withMessage("Not valid is user id").escape(),
+    body("comment")
+      .isString()
+      .withMessage("Not valid is comment type")
+      .escape(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -74,7 +77,7 @@ router.post(
 
 router.delete(
   "/delete/:id",
-  [param("id").isMongoId().withMessage("Not valid params ")],
+  [param("id").isMongoId().withMessage("Not valid params ").escape()],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

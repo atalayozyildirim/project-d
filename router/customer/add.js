@@ -6,11 +6,11 @@ const router = express.Router();
 router.post(
   "/add",
   [
-    body("name").isString().withMessage("Email required !"),
-    body("email").isEmail().withMessage("Email required !"),
-    body("company").isString().withMessage("Company required !"),
-    body("phone").isString().withMessage("Phone required !"),
-    body("address").isString().withMessage("Address required !"),
+    body("name").isString().escape().withMessage("Email required !"),
+    body("email").isEmail().escape().withMessage("Email required !"),
+    body("company").isString().escape().withMessage("Company required !"),
+    body("phone").isString().escape().withMessage("Phone required !"),
+    body("address").isString().escape().withMessage("Address required !"),
   ],
   async (req, res) => {
     const error = validationResult(req);

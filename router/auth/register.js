@@ -8,9 +8,16 @@ const router = express.Router();
 router.post(
   "/register",
   [
-    body("name").notEmpty().withMessage("Name cannot be empty"),
-    body("email").notEmpty().isEmail().withMessage("Email cannot be empty"),
-    body("password").notEmpty().withMessage("Password cannot be empty"),
+    body("name").notEmpty().withMessage("Name cannot be empty").escape(),
+    body("email")
+      .notEmpty()
+      .isEmail()
+      .withMessage("Email cannot be empty")
+      .escape(),
+    body("password")
+      .notEmpty()
+      .withMessage("Password cannot be empty")
+      .escape(),
   ],
   async (req, res) => {
     try {

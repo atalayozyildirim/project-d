@@ -52,8 +52,16 @@ router.post("/read/:id", async (req, res) => {
 router.post(
   "/create",
   [
-    body("title").isString().notEmpty().withMessage("Title is required !"),
-    body("message").isString().notEmpty().withMessage("Message is required !"),
+    body("title")
+      .isString()
+      .notEmpty()
+      .escape()
+      .withMessage("Title is required !"),
+    body("message")
+      .isString()
+      .notEmpty()
+      .escape()
+      .withMessage("Message is required !"),
   ],
   async (req, res) => {
     try {

@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.delete(
   "/delete/:id",
-  [param("id").isString().notEmpty().withMessage("id required")],
+  [param("id").isString().notEmpty().escape().withMessage("id required")],
   async (req, res) => {
     const { id } = req.params;
 

@@ -12,22 +12,38 @@ router.post(
     body("invoiceNumber")
       .isString()
       .notEmpty()
+      .escape()
       .withMessage("Invoice number is required"),
     body("invoiceDate")
       .isDate()
       .notEmpty()
+      .escape()
       .withMessage("Invoice date is required"),
     body("customerName")
       .isString()
+      .escape()
       .notEmpty()
       .withMessage("CustomerName is required"),
     body("customerAddress")
       .isString()
+      .escape()
       .notEmpty()
       .withMessage("Customer address is required"),
-    body("items").isArray().notEmpty().withMessage("Items is required"),
-    body("total").isNumeric().notEmpty().withMessage("Total is required"),
-    body("status").isString().notEmpty().withMessage("Status is required"),
+    body("items")
+      .isArray()
+      .notEmpty()
+      .escape()
+      .withMessage("Items is required"),
+    body("total")
+      .isNumeric()
+      .notEmpty()
+      .escape()
+      .withMessage("Total is required"),
+    body("status")
+      .isString()
+      .notEmpty()
+      .escape()
+      .withMessage("Status is required"),
   ],
   async (req, res) => {
     const errors = validationResult(req);

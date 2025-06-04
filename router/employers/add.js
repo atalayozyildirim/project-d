@@ -7,11 +7,27 @@ const router = express.Router();
 router.post(
   "/add",
   [
-    body("name").isString().notEmpty().withMessage("Name is required"),
-    body("surname").isString().notEmpty().withMessage("Surname is required"),
-    body("email").isEmail().notEmpty().withMessage("Email is required"),
-    body("phone").isString().notEmpty().withMessage("Phone is required"),
-    body("salary").isNumeric().notEmpty().withMessage("Salary is required"),
+    body("name").isString().notEmpty().withMessage("Name is required").escape(),
+    body("surname")
+      .isString()
+      .notEmpty()
+      .escape()
+      .withMessage("Surname is required"),
+    body("email")
+      .isEmail()
+      .notEmpty()
+      .escape()
+      .withMessage("Email is required"),
+    body("phone")
+      .isString()
+      .notEmpty()
+      .escape()
+      .withMessage("Phone is required"),
+    body("salary")
+      .isNumeric()
+      .notEmpty()
+      .escape()
+      .withMessage("Salary is required"),
   ],
   async (req, res) => {
     const errors = validationResult(req);

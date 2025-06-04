@@ -8,20 +8,34 @@ const router = express.Router();
 router.post(
   "/add",
   [
-    body("title").isString().notEmpty().withMessage("Title required !"),
+    body("title")
+      .isString()
+      .notEmpty()
+      .escape()
+      .withMessage("Title required !"),
     body("priority")
       .isIn(["low", "medium", "high"])
+      .escape()
       .withMessage("Priority required value [low,high,medium] !"),
     body("assignedTo")
       .isMongoId()
+      .escape()
       .notEmpty()
       .withMessage("AssignedTo required  Mongo Object ID!"),
     body("description")
       .isString()
       .notEmpty()
       .withMessage("Description required !"),
-    body("status").isString().notEmpty().withMessage("Status required !"),
-    body("dueDate").isDate().notEmpty().withMessage("Due Date required !"),
+    body("status")
+      .isString()
+      .notEmpty()
+      .escape()
+      .withMessage("Status required !"),
+    body("dueDate")
+      .isDate()
+      .notEmpty()
+      .escape()
+      .withMessage("Due Date required !"),
   ],
   async (req, res) => {
     const err = validationResult(req);
@@ -94,6 +108,7 @@ router.put(
       .isString()
       .notEmpty()
       .isIn(["pendig", "completed", "in progress"])
+      .escape()
       .withMessage("Status required !"),
   ],
   async (req, res) => {

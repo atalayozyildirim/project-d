@@ -13,7 +13,7 @@ const redisClient = createClient({
     host: process.env.REDIS_URI,
     port: process.env.REDIS_PORT,
   },
-})
+});
 redisClient.connect().catch((e) => console.log("Redis connection failed"));
 
 const router = express.Router();
@@ -21,8 +21,12 @@ const router = express.Router();
 router.post(
   "/login",
   [
-    body("email").isEmail().notEmpty().withMessage("Email is required"),
-    body("password").notEmpty().withMessage("Password is required"),
+    body("email")
+      .isEmail()
+      .notEmpty()
+      .withMessage("Email is required")
+      .escape(),
+    body("password").notEmpty().withMessage("Password is required").escape(),
   ],
   async (req, res) => {
     const errors = validationResult(req);

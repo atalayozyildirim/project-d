@@ -45,24 +45,34 @@ app.use(
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "www.atalay.studio",
-      "atalay.studio",
-      "https://atalay.studio",
-      "https://www.atalay.studio",
-      "http://atalay.studio",
-      "http://localhost:3000",
-      "http://api.atalay.studio",
-      "https://api.atalay.studio",
-    ],
+    origin: ["http://localhost:5173", "http://localhost:3000"],
     credentials: true,
     exposedHeaders: ["set-cookie"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "http://localhost:5173", "http://localhost:3000"],
+        styleSrc: ["'self'", "https:", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: [
+          "'self'",
+          "ws://localhost:3000",
+          "http://localhost:5173",
+          "http://localhost:3000",
+        ],
+        fontSrc: ["'self'", "https:", "data:"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+  })
+);
 app.use(morgan("tiny"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -79,7 +89,6 @@ const server = app.listen(3000, async () => {
     await redisConnect(redisClient);
 
     // Connect to WebSocket
-
     await MyWebSocketInstance.connect(server);
   } catch (error) {
     console.log("Error: ", error);

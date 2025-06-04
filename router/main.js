@@ -11,6 +11,7 @@ import commentRouter from "./comment/comment.js";
 import aiRouter from "./ai/index.js";
 import notification from "./notfications/index.js";
 import search from "./search/index.js";
+import Product from "./product/index.js";
 import { currentUser } from "../middleware/currentUser.js";
 
 const router = express.Router();
@@ -26,6 +27,7 @@ router.use("/comment", currentUser, commentRouter);
 router.use("/ai", currentUser, aiRouter);
 router.use("/mail", currentUser, mailRouter);
 router.use("/notification", currentUser, notification);
+router.use("/product", currentUser, Product);
 router.use("/search", currentUser, search);
 
 export default router;

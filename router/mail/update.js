@@ -7,11 +7,15 @@ const router = express.Router();
 router.patch(
   "/update/:id",
   [
-    body("user").optional().isString(),
-    body("password").optional().isString(),
-    body("host").optional().isString(),
-    body("port").optional().isInt(),
-    body("from").optional().isString(),
+    body("user").optional().isString().escape(),
+    body("password").optional().isString().escape(),
+    body("host").optional().isString().escape(),
+    body("port").optional().isInt().escape(),
+    body("from")
+      .optional()
+      .isString()
+      .escape()
+      .withMessage("From is required!"),
   ],
   async (req, res) => {
     const { id } = req.params;

@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post(
   "/reset-password",
-  [body("email").isEmail().withMessage("Not valid email")],
+  [body("email").isEmail().withMessage("Not valid email").escape()],
   async (req, res) => {
     try {
       const errors = validationResult(req);

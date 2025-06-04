@@ -7,10 +7,14 @@ const router = express.Router();
 
 router.post(
   "/imap/add",
-  body("host").isString().notEmpty().withMessage("Host not valid !"),
-  body("port").isInt().notEmpty().withMessage("Port not valid !"),
-  body("user").isString().notEmpty().withMessage("User not valid !"),
-  body("password").isString().notEmpty().withMessage("Password not valid !"),
+  body("host").isString().notEmpty().withMessage("Host not valid !").escape(),
+  body("port").isInt().notEmpty().escape().withMessage("Port not valid !"),
+  body("user").isString().notEmpty().escape().withMessage("User not valid !"),
+  body("password")
+    .isString()
+    .escape()
+    .notEmpty()
+    .withMessage("Password not valid !"),
   async (req, res) => {
     const err = validationResult(req);
     try {
@@ -58,11 +62,15 @@ router.post(
 router.post(
   "/add",
   [
-    body("host").isString().notEmpty().withMessage("Host not valid !"),
-    body("port").isInt().notEmpty().withMessage("Port not valid !"),
-    body("user").isString().notEmpty().withMessage("User not valid !"),
-    body("password").isString().notEmpty().withMessage("Password not valid !"),
-    body("from").isString().notEmpty().withMessage("From not valid !"),
+    body("host").isString().notEmpty().escape().withMessage("Host not valid !"),
+    body("port").isInt().notEmpty().escape().withMessage("Port not valid !"),
+    body("user").isString().notEmpty().escape().withMessage("User not valid !"),
+    body("password")
+      .isString()
+      .notEmpty()
+      .escape()
+      .withMessage("Password not valid !"),
+    body("from").isString().notEmpty().escape().withMessage("From not valid !"),
   ],
   async (req, res) => {
     const err = validationResult(req);
