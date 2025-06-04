@@ -29,11 +29,7 @@ router.post(
       .escape()
       .notEmpty()
       .withMessage("Customer address is required"),
-    body("items")
-      .isArray()
-      .notEmpty()
-      .escape()
-      .withMessage("Items is required"),
+    body("items").isArray().notEmpty().withMessage("Items is required"),
     body("total")
       .isNumeric()
       .notEmpty()
@@ -77,6 +73,7 @@ router.post(
       total,
       status: status || "Pending",
     });
+
     await newInvoice.save();
 
     return res
